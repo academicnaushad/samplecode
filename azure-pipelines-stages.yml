@@ -1,0 +1,114 @@
+variables :
+- name: yamlvariable
+  value: "Yaml Variable"
+- group: SampleVariableGroup
+
+parameters:
+  - name: Enviroment
+    default: Development
+    type: string
+    values:
+      - Development
+      - SIT
+      - UAT
+      - PreProduction
+      - Production
+
+stages :
+  - stage: devstage
+    jobs:
+      - job: JOBDEV1
+        steps:
+          - script: |
+              echo "JOBDEV1"
+              echo "$(var1)"
+              echo "${{parameters['Enviroment']}}"
+              echo "Hello World1"
+              echo "Hello World2"
+              echo "Hello World3"
+              echo "Hello World4"
+            displayName: JOB_DEV1_STEP1
+            name: JOB_DEV1_STEP1
+          - script: |
+              echo "Accessing yaml variable"
+              echo "$(yamlvariable)"
+            displayName: JOB_DEV1_STEP2
+            name: JOB_DEV1_STEP2
+
+  - stage: SIT
+    jobs:
+      - job: JOBSIT1
+        steps:
+          - script: |
+              echo "JOBSIT1"
+              echo "Enviroment ${{parameters['Enviroment']}}"
+              echo "##vso[task.setvariable variable=yamlvariable;isOutput=true]YAML VARIABLE 1"
+              echo "Hello World1"
+              echo "Hello World2"
+              echo "Hello World3"
+              echo "Hello World4"
+            displayName: JOB_SIT1_STEP1
+            name: JOB_SIT1_STEP1
+          - script: |
+              echo $(JOB_SIT1_STEP1.yamlvariable)
+
+
+      - job: JOBSIT2
+        dependsOn: JOBSIT1
+        variables:
+          SIT_yamlvariable : $[dependencies.JOBSIT1.outputs['JOB_SIT1_STEP1.yamlvariable']]
+        steps:
+          - script: |
+              echo "JOBSIT1"
+              echo "$(SIT_yamlvariable)"
+              echo "Hello World1"
+              echo "Hello World2"
+              echo "Hello World3"
+              echo "Hello World4"
+            displayName: JOB_SIT2_STEP1
+            name: JOB_SIT2_STEP1
+
+
+  - stage: UAT
+    dependsOn: SIT
+    jobs:
+      - job: JOBUAT1
+        variables:
+            devStageVar : $[stageDependencies.SIT.JOBSIT1.outputs['JOB_SIT1_STEP1.yamlvariable']]
+        steps:
+          - script: |
+              echo "JOBUAT1"
+              echo "$(yamlvariable)"
+              echo "Hello World1"
+              echo "Hello World2"
+              echo "Hello World3"
+              echo "Hello World4"
+              echo "$(devStageVar)"
+            displayName: JOB_UAT1_STEP1
+            name: JOB_UAT1_STEP1
+
+  - stage: preProduction
+    condition: false
+    jobs:
+      - job: preProductiongetlatest
+        steps:
+          - script: |
+              echo "preProduction"
+              echo "Hello World1"
+              echo "Hello World2"
+              echo "Hello World3"
+              echo "Hello World4"
+            displayName: PreProduction_step1
+
+  - stage: Production
+    condition: false
+    jobs:
+      - job: Productiongetlatest
+        steps:
+          - script: |
+              echo "Production"
+              echo "Hello World1"
+              echo "Hello World2"
+              echo "Hello World3"
+              echo "Hello World4"
+            displayName: Production_step1

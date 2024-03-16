@@ -1,0 +1,39 @@
+{
+  "profiles": {
+    "SampleWebApp": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DockerTest": "Hey Docker Enviroment Variable"//,
+        //"SQLConnection": "Data Source=\"172.22.48.101,1524;Initial Catalog=OptiQMaster;Persist Security Info=True;TrustServerCertificate=True;User ID=sa;Password=vision_13"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5136"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "http://+:80"
+      },
+      "publishAllPorts": true
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:29306",
+      "sslPort": 0
+    }
+  }
+}

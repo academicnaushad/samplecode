@@ -1,0 +1,34 @@
+
+FROM mcr.microsoft.com/windows/servercore/iis as base
+SHELL ["powershell","-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'Continue'; $verbosePreference='Continue';"]
+#ENV DockerTest="Hey Enviroment Variable"
+ADD https://download.visualstudio.microsoft.com/download/pr/2d151460-8311-4452-9a2e-dfb1447f2e9b/15c599ea357a0e4dc333d28b351f1c6c/dotnet-hosting-6.0.24-win.exe "C:/Setup/dotnet-hosting-6.0.24-win.exe"
+RUN start-process -Filepath "C:/setup/dotnet-hosting-6.0.24-win.exe" -ArgumentList @('/install', '/quiet', '/norestart') -Wait
+#RUN Remove-Item -Force "C:/setup/dotnet-hosting-6.0.24-win.exe"
+
+
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["SampleWebApp/SampleWebApp.csproj", "SampleWebApp/"]
+RUN dotnet restore "SampleWebApp/SampleWebApp.csproj"
+COPY . .
+WORKDIR "/src/SampleWebApp"
+RUN dotnet build "SampleWebApp.csproj" -c Release -o /app/build
+
+
+FROM build AS publish
+RUN dotnet publish "SampleWebApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 as runtime
+FROM base as final
+WORKDIR /DockerSharePath #this folder is created to map with external drive folder
+WORKDIR /app
+COPY --from=publish /app/publish .
+RUN Remove-Website -Name 'Default Web Site'
+RUN New-WebSite -Name 'samplewebapp' \ 
+	-Port 80 \
+	-PhysicalPath 'C:\app'
+
+EXPOSE 80

@@ -1,0 +1,40 @@
+variables:
+  - group: SampleVariableGroup
+  - name: Name
+    value: NN
+  - name: City
+    value: DXB
+  - name: solution
+    value: '**/*.sln'
+  - name: buildPlatform
+    value: 'Any CPU'
+  - name: buildConfiguration
+    value: 'Release'
+
+parameters:
+  - name: enviroment
+    displayName : "Which enviroment to deploy?"
+    default : "Development"
+    type : "string"
+    values :
+      - development
+      - SIT
+      - UAT
+      - PreProduction
+      - Production
+
+steps:
+ - script : | 
+    echo "Enviroment ${{parameters.enviroment}}"
+    echo "Hello"
+    echo "Hello1"
+    echo "Name $(Name)"
+    echo "group variable access  $(var1)"
+    echo "##vso[task.setvariable variable=var1;]test 3"
+   displayName: "step1 variable"
+
+
+ - script: | 
+     echo "Variable group access $(var2)"
+     echo "Variable group access $(var1)"
+   displayName: step2 variable

@@ -1,0 +1,12 @@
+version: '1.0'
+
+services:
+ webapp: 
+  build: .
+  container_name: samplewebapp3
+  image: mvccoreimage1
+  ports: 
+   - 8095:80
+  environment: 
+    DockerTest: 'Hey This is docker enviroment variable'
+    SQLConnection: 'Data Source=172.22.48.226,1433;Initial Catalog=OptiQMaster;Persist Security Info=True;TrustServerCertificate=True;User ID=sa;Password=vision_13'
